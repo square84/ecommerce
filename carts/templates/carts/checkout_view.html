@@ -2,7 +2,23 @@
 {% load i18n %}
 {% load crispy_forms_tags %}
 
+
+
+<script>
+{% block jquery %}
+
+var clientToken = "{{ client_token }}"
+braintree.setup(clientToken, "dropin", {
+  container: "payment-form"
+});
+
+
+{% endblock %}
+</script>
+
 {% block content %}
+
+
 
 {% if not user_can_continue %}
 <div class="col-sm-6">
@@ -25,5 +41,27 @@
         <p >{% trans "Not a member?" %} <a href="{% url 'registration_register' %}">{% trans "Register" %}</a>.</p>
     </p>
 </div>
+
+{% else %}
+<div class="col-sm-4 col-sm-offset-4 text-center">
+
+    {% include "orders/order_summary_short.html" with order=order %}
+<br/>
+<p>
+     <a href="{% url 'order_address' %}">Change an Address</a>
+</p>
+<br/>
+<form id="checkout" method="POST" action="{% url 'checkout_final' %}">{% csrf_token %}
+    <!--<input type="hidden" name="payment_token" value="ABC" /> -->
+<div id="payment-form"></div>
+
+<p>
+    <b><button type="submit">Complete Order</button></b><br/>
+
+</p>
+</form>
+
+</div>
+
 {% endif %}
 {% endblock %}
